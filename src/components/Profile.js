@@ -8,7 +8,7 @@ import { useLocation, useParams } from 'react-router-dom';
 export default function Profile () {
     const [data, setData] = useState([]);
     const [dataFetched, setDataFetched] = useState(false);
-    const [address, setAddress] = useState("0x");
+    const [address, setAddress] = useState("0xaa36a7");
     const [totalPrice, setTotalPrice] = useState("0");
 
     const { tokenId } = useParams();

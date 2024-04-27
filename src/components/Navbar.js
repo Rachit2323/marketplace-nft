@@ -1,12 +1,9 @@
-import logo from '../logo_3.png';
-import fullLogo from '../full_logo.png';
+
 import {
   BrowserRouter as Router,
-  Switch,
-  Route,
+
   Link,
-  useRouteMatch,
-  useParams
+
 } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
@@ -15,7 +12,8 @@ function Navbar() {
 
 const [connected, toggleConnect] = useState(false);
 const location = useLocation();
-const [currAddress, updateAddress] = useState('0x');
+const [currAddress, updateAddress] = useState('0xaa36a7');
+
 
 async function getAddress() {
   const ethers = require("ethers");
@@ -37,9 +35,9 @@ function updateButton() {
 async function connectWebsite() {
 
     const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+    console.log('chan',chainId);
     if(chainId !== '0xaa36a7')
     {
-      //alert('Incorrect network! Switch your metamask network to Rinkeby');
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: '0xaa36a7' }],
@@ -48,7 +46,7 @@ async function connectWebsite() {
     await window.ethereum.request({ method: 'eth_requestAccounts' })
       .then(() => {
         updateButton();
-        console.log("here");
+
         getAddress();
         window.location.replace(location.pathname)
       });
@@ -57,19 +55,29 @@ async function connectWebsite() {
   useEffect(() => {
     if(window.ethereum == undefined)
       return;
-    let val = window.ethereum.isConnected();
-    if(val)
-    {
-      console.log("here");
-      getAddress();
-      toggleConnect(val);
-      updateButton();
-    }
-
+    // let val = window.ethereum.isConnected();
+    window.ethereum
+    .request({ method: 'eth_accounts' })
+    .then((accounts) => {
+        if (accounts.length > 0) {
+            console.log('MetaMask is connected!');
+            getAddress();
+            toggleConnect(true);
+            updateButton();
+            // MetaMask account is connected, do something
+        } else {
+            console.log('MetaMask is not connected.');
+            // MetaMask account is not connected
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+ 
     window.ethereum.on('accountsChanged', function(accounts){
       window.location.replace(location.pathname)
     })
-  });
+  },[]);
 
     return (
       <div className="">
@@ -77,7 +85,6 @@ async function connectWebsite() {
           <ul className='flex items-end justify-between py-3 bg-transparent text-white pr-5'>
           <li className='flex items-end ml-5 pb-2'>
             <Link to="/">
-            <img src={fullLogo} alt="" width={120} height={120} className="inline-block -mt-2"/>
             <div className='inline-block font-bold text-xl ml-2'>
               NFT Marketplace
             </div>
@@ -113,14 +120,14 @@ async function connectWebsite() {
               </li>              
               }  
               <li>
-                <button className="enableEthereumButton bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm" onClick={connectWebsite}>{connected? "Connected":"Connect Wallet"}</button>
+                <button className="enableEthereumButton bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm" onClick={()=>connectWebsite()}>{connected? "Connected":"Connect Wallet"}</button>
               </li>
             </ul>
           </li>
           </ul>
         </nav>
         <div className='text-white text-bold text-right mr-10 text-sm'>
-          {currAddress !== "0x" ? "Connected to":"Not Connected. Please login to view NFTs"} {currAddress !== "0x" ? (currAddress.substring(0,15)+'...'):""}
+          {currAddress !== "0xaa36a7" ? "Connected to":"Not Connected. Please login to view NFTs"} {currAddress !== "0xaa36a7" ? (currAddress.substring(0,15)+'...'):""}
         </div>
       </div>
     );

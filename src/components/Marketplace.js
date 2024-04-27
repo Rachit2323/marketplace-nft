@@ -2,7 +2,7 @@ import Navbar from "./Navbar";
 import NFTTile from "./NFTTile";
 import MarketplaceJSON from "../Marketplace.json";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GetIpfsUrlFromPinata } from "../utils";
 
 export default function Marketplace() {
@@ -21,7 +21,7 @@ async function getAllNFTs() {
     let transaction = await contract.getAllNFTs()
 
     //Fetch all the details of every NFT from the contract and display
-    const items = await Promise.all(transaction.map(async i => {
+    const items = await Promise?.all(transaction?.map(async i => {
         var tokenURI = await contract.tokenURI(i.tokenId);
         console.log("getting this tokenUri", tokenURI);
         tokenURI = GetIpfsUrlFromPinata(tokenURI);
@@ -45,8 +45,30 @@ async function getAllNFTs() {
     updateData(items);
 }
 
-if(!dataFetched)
-    getAllNFTs();
+useEffect(()=>{
+    if(!dataFetched)
+    {
+        window.ethereum
+        .request({ method: 'eth_accounts' })
+        .then((accounts) => {
+            if (accounts.length > 0) {
+                getAllNFTs();
+                console.log('MetaMask is connected!');
+                // MetaMask account is connected, do something
+            } else {
+                console.log('MetaMask is not connected.');
+                // MetaMask account is not connected
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+   
+},[dataFetched])
+
+// if(!dataFetched)
+//     getAllNFTs();
 
 return (
     <div>
@@ -56,7 +78,7 @@ return (
                 Top NFTs
             </div>
             <div className="flex mt-5 justify-between flex-wrap max-w-screen-xl text-center">
-                {data.map((value, index) => {
+                {data?.map((value, index) => {
                     return <NFTTile data={value} key={index}></NFTTile>;
                 })}
             </div>
