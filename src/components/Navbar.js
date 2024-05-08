@@ -35,7 +35,7 @@ function updateButton() {
 async function connectWebsite() {
 
     const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-    console.log('chan',chainId);
+
     if(chainId !== '0xaa36a7')
     {
       await window.ethereum.request({
